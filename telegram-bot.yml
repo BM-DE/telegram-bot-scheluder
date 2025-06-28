@@ -1,0 +1,34 @@
+name: Telegram Bot Scheduler
+
+on:
+  schedule:
+    - cron: '10 5 * * *'  # 00:10 AM Lima (UTC-5)
+  workflow_dispatch:  # Esto permite ejecutarlo manualmente
+
+jobs:
+  send-message:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.9'
+    - name: Install dependencies
+      run: pip install requests
+    - name: Check script existence
+      run: |
+        if [ -f "bot_telegram.py" ]; then
+          echo "Script bot_telegram.py found"
+        else
+          echo "Error: bot_telegram.py not found"
+          exit 1
+        fi
+    - name: Send Telegram message
+      env:
+        TELEGRAM_BOT_TOKEN: '7920295504:AAFc4evIRk4jl7ekBxgfm2eX5E6fTYUclNE'
+        TELEGRAM_CHAT_ID: '5518550492'
+      run: |
+        echo "Starting Telegram bot execution"
+        echo "Token and chat ID are set (not displaying for security)"
+        python bot_telegram.py || echo "Script failed with exit code $?"
