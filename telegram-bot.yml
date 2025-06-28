@@ -2,7 +2,9 @@ name: Telegram Bot Scheduler
 
 on:
   schedule:
-    - cron: '10 5 * * *'  # 00:10 AM Lima (UTC-5)
+    - cron: '0 13 * * *'  # 8:00 AM Lima (UTC-5)
+    - cron: '0 15 * * *'  # 10:00 AM Lima (UTC-5)
+    - cron: '45 17 * * *' # 12:45 PM Lima (UTC-5)
   workflow_dispatch:  # Esto permite ejecutarlo manualmente
 
 jobs:
@@ -15,7 +17,7 @@ jobs:
       with:
         python-version: '3.9'
     - name: Install dependencies
-      run: pip install requests
+  run: pip install requests pytz
     - name: Check script existence
       run: |
         if [ -f "bot_telegram.py" ]; then
@@ -30,5 +32,4 @@ jobs:
         TELEGRAM_CHAT_ID: '5518550492'
       run: |
         echo "Starting Telegram bot execution"
-        echo "Token and chat ID are set (not displaying for security)"
         python bot_telegram.py || echo "Script failed with exit code $?"
