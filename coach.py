@@ -2,10 +2,15 @@ import random
 import requests
 import os
 from datetime import datetime
+import pytz
 
 # --- CONFIGURACIÓN ---
-BOT_TOKEN = os.environ.get('7920295504:AAFc4evIRk4jl7ekBxgfm2eX5E6fTYUclNE')
-CHAT_ID = os.environ.get('5518550492')
+BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN')
+CHAT_ID = os.environ.get('TELEGRAM_CHAT_ID')
+
+# Imprimir valores para depuración (solo primeros caracteres por seguridad)
+print(f"Token recibido: {BOT_TOKEN[:5]}... (parcial)")
+print(f"Chat ID recibido: {CHAT_ID}")
 
 # --- LISTA DE MENSAJES MOTIVACIONALES POR CATEGORÍA ---
 mensajes_por_categoria = {
@@ -54,24 +59,34 @@ def enviar_mensaje_telegram(mensaje):
         "text": mensaje,
         "parse_mode": "Markdown"
     }
-    response = requests.post(url, json=payload)
-    return response.json()
+    try:
+        response = requests.post(url, json=payload)
+        response.raise_for_status()  # Lanza excepción si falla
+        print(f"Respuesta de Telegram: {response.text}")
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"❌ Error al enviar mensaje: {e}")
+        return None
 
 # --- FUNCIÓN PARA SELECCIONAR MENSAJE SEGÚN LA HORA ---
 def seleccionar_mensaje_por_hora():
-    hora_actual = datetime.now().hour
+    lima_tz = pytz.timezone('America/Lima')
+    hora_actual = datetime.now(lima_tz).hour
+    print(f"Hora actual en Lima: {hora_actual}:00")
     
     if hora_actual == 8:  # 8:00 AM
         categoria = "salir_exponer"
     elif hora_actual == 10:  # 10:00 AM
         categoria = "confianza_comunicacion"
-    elif hora_actual == 12:  # 12:45 PM
+    elif hora_actual == 12:  # 12:45 PM (aproximado al cron)
         categoria = "inspirador_general"
     else:
-        # Mensaje por defecto si se ejecuta en otra hora
+        # Para pruebas manuales, usa inspirador_general por defecto
         categoria = "inspirador_general"
     
-    return random.choice(mensajes_por_categoria[categoria])
+    mensaje = random.choice(mensajes_por_categoria[categoria])
+    print(f"Mensaje seleccionado: {mensaje}")
+    return mensaje
 
 # --- PROGRAMA PRINCIPAL ---
 def main():
@@ -82,10 +97,10 @@ def main():
     mensaje = seleccionar_mensaje_por_hora()
     resultado = enviar_mensaje_telegram(mensaje)
     
-    if resultado.get('ok'):
+    if resultado and resultado.get('ok'):
         print(f"✅ Mensaje enviado exitosamente: {mensaje}")
     else:
-        print(f"❌ Error al enviar mensaje: {resultado}")
+        print(f"❌ Error al enviar mensaje: {resultado or 'No response from Telegram'}")
 
 if __name__ == "__main__":
     main()
