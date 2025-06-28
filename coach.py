@@ -9,6 +9,9 @@ BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN')
 CHAT_ID = os.environ.get('TELEGRAM_CHAT_ID')
 
 # Imprimir valores para depuración (solo primeros caracteres por seguridad)
+if not BOT_TOKEN or not CHAT_ID:
+    print("❌ Error: BOT_TOKEN o CHAT_ID no configurados")
+    exit(1)  # Fuerza el fallo del workflow si falta algo
 print(f"Token recibido: {BOT_TOKEN[:5]}... (parcial)")
 print(f"Chat ID recibido: {CHAT_ID}")
 
@@ -66,7 +69,7 @@ def enviar_mensaje_telegram(mensaje):
         return response.json()
     except requests.exceptions.RequestException as e:
         print(f"❌ Error al enviar mensaje: {e}")
-        return None
+        exit(1)  # Fuerza el fallo del workflow si hay un error de red
 
 # --- FUNCIÓN PARA SELECCIONAR MENSAJE SEGÚN LA HORA ---
 def seleccionar_mensaje_por_hora():
@@ -81,7 +84,6 @@ def seleccionar_mensaje_por_hora():
     elif hora_actual == 12:  # 12:45 PM (aproximado al cron)
         categoria = "inspirador_general"
     else:
-        # Para pruebas manuales, usa inspirador_general por defecto
         categoria = "inspirador_general"
     
     mensaje = random.choice(mensajes_por_categoria[categoria])
@@ -90,10 +92,6 @@ def seleccionar_mensaje_por_hora():
 
 # --- PROGRAMA PRINCIPAL ---
 def main():
-    if not BOT_TOKEN or not CHAT_ID:
-        print("❌ Error: BOT_TOKEN o CHAT_ID no configurados")
-        return
-    
     mensaje = seleccionar_mensaje_por_hora()
     resultado = enviar_mensaje_telegram(mensaje)
     
@@ -101,6 +99,7 @@ def main():
         print(f"✅ Mensaje enviado exitosamente: {mensaje}")
     else:
         print(f"❌ Error al enviar mensaje: {resultado or 'No response from Telegram'}")
+        exit(1)
 
 if __name__ == "__main__":
     main()
