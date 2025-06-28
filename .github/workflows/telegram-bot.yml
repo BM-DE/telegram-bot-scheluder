@@ -16,8 +16,19 @@ jobs:
         python-version: '3.9'
     - name: Install dependencies
       run: pip install requests
+    - name: Check script existence
+      run: |
+        if [ -f "bot_telegram.py" ]; then
+          echo "Script bot_telegram.py found"
+        else
+          echo "Error: bot_telegram.py not found"
+          exit 1
+        fi
     - name: Send Telegram message
       env:
-        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-      run: python bot_telegram.py
+        TELEGRAM_BOT_TOKEN: '7920295504:AAFc4evIRk4jl7ekBxgfm2eX5E6fTYUclNE'
+        TELEGRAM_CHAT_ID: '5518550492'
+      run: |
+        echo "Starting Telegram bot execution"
+        echo "Token and chat ID are set (not displaying for security)"
+        python bot_telegram.py || echo "Script failed with exit code $?"
