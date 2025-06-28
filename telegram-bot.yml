@@ -17,13 +17,13 @@ jobs:
       with:
         python-version: '3.9'
     - name: Install dependencies
-  run: pip install requests pytz
+      run: pip install requests pytz
     - name: Check script existence
       run: |
-        if [ -f "bot_telegram.py" ]; then
-          echo "Script bot_telegram.py found"
+        if [ -f "coach.py" ]; then
+          echo "Script coach.py found"
         else
-          echo "Error: bot_telegram.py not found"
+          echo "Error: coach.py not found"
           exit 1
         fi
     - name: Send Telegram message
@@ -32,4 +32,4 @@ jobs:
         TELEGRAM_CHAT_ID: '5518550492'
       run: |
         echo "Starting Telegram bot execution"
-        python bot_telegram.py || echo "Script failed with exit code $?"
+        python coach.py || echo "Script failed with exit code $?"
