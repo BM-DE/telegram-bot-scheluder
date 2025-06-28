@@ -3,6 +3,7 @@ name: Telegram Bot Scheduler
 on:
   schedule:
     - cron: '10 5 * * *'  # 00:10 AM Lima (UTC-5)
+  workflow_dispatch:  # Esto permite ejecutarlo manualmente
 
 jobs:
   send-message:
